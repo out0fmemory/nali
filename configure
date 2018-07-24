@@ -1,0 +1,119 @@
+#!/bin/sh
+prefix=/usr/local
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+echo "Usage: ./configure [options]"
+echo "  --help               print this message"
+echo "  --prefix=PREFIX      default:/usr/local"
+echo "  --bindir=BINDIR      default:$prefix/bin"
+echo "  --datadir=BINDIR     default:$prefix/share"
+echo ""
+exit 1
+fi
+
+if test ! -d ./libqqwry
+then
+    echo there is no ./libqqwry
+    echo see http://code.google.com/p/qqwry/
+    exit 1
+fi
+
+if test ! -f ./share/QQWry.Dat
+then
+    echo please download QQWry.Dat from https://chenze.name/wenjian/QQWry.Dat 
+    exit 1
+fi
+
+
+
+# parse options
+
+for opt do
+    optarg="${opt#*=}"
+    case "$opt" in
+        --prefix=*)
+            prefix="$optarg"
+            ;;
+        --bindir=*)
+            bindir="$optarg"
+            ;;
+        --datadir=*)
+            datadir="$optarg"
+            ;;
+    esac
+done
+
+if test "z$bindir" = "z" 
+then
+    bindir=${prefix}/bin
+fi
+
+if test "z$datadir" = "z" 
+then
+    datadir=${prefix}/share
+fi
+
+
+# generate config files
+
+cat > config.mak << EOF
+prefix=$prefix
+bindir=$bindir
+datadir=$datadir
+EOF
+
+cat > config.h << EOF
+#define NALI_QQWRY_PATH "$datadir/QQWry.Dat"
+EOF
+
+cat > bin/nali << EOF
+#!/bin/sh
+if test \$# -gt 0
+then
+    echo \$@|perl $datadir/nali.pl
+else
+    perl $datadir/nali.pl
+fi
+EOF
+
+cat > bin/nali-update << EOF
+#!/bin/sh
+qqwry_dat_url="https://chenze.name/wenjian/QQWry.Dat";
+qqwry_dat_local_path="$datadir/QQWry.Dat"
+curl=\`which curl\`
+wget=\`which wget\`
+
+if ! test -w \$qqwry_dat_local_path
+then
+    echo You may need sudo
+    exit 1
+fi
+
+if test -f /tmp/QQWry.Dat
+then
+    rm -f /tmp/QQWry.Dat || exit 1
+fi
+
+if test "x\$curl" != "x" &&  test -x \$curl 
+then
+    command="\$curl -k --compressed \$qqwry_dat_url -o /tmp/QQWry.Dat"
+elif test "x\$wget" != "x" &&  test -x \$wget
+then
+    command="\$wget --no-check-certificate \$qqwry_dat_url -O /tmp/QQWry.Dat"
+else
+    echo Error: Please install curl or wget
+    exit 1
+fi 
+echo Updating \$qqwry_dat_local_path
+\$command && mv /tmp/QQWry.Dat \$qqwry_dat_local_path && echo Successfully Updated && exit 0
+
+echo Failed to update
+exit 1
+EOF
+
+echo '***** Configure Successfully *****'
+echo
+echo "Install:"
+echo 'make && make install'
+echo
+echo "Usage and Examples:";
+echo 'http://www.surfchen.org/wiki/Nali'
