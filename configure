@@ -77,7 +77,8 @@ EOF
 
 cat > bin/nali-update << EOF
 #!/bin/sh
-qqwry_dat_url="https://chenze.name/wenjian/QQWry.Dat";
+#qqwry_dat_url="https://chenze.name/wenjian/QQWry.Dat";
+qqwry_dat_url="https://github.com/out0fmemory/qqwry.dat/raw/master/qqwry_lastest.dat";
 qqwry_dat_local_path="$datadir/QQWry.Dat"
 curl=\`which curl\`
 wget=\`which wget\`
