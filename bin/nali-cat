@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -z ${1} ]; then
+	echo "empty cat file"
+	exit 0
+fi
+cat ${1} |nali
