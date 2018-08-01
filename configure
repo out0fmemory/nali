@@ -96,7 +96,7 @@ fi
 
 if test "x\$curl" != "x" &&  test -x \$curl 
 then
-    command="\$curl -k --compressed \$qqwry_dat_url -o /tmp/QQWry.Dat"
+    command="\$curl -L  -k --compressed \$qqwry_dat_url -o /tmp/QQWry.Dat"
 elif test "x\$wget" != "x" &&  test -x \$wget
 then
     command="\$wget --no-check-certificate \$qqwry_dat_url -O /tmp/QQWry.Dat"
